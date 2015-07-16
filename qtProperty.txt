@@ -1,0 +1,57 @@
+Q_PROPERTY(type name
+           (READ getFunction [WRITE setFunction] |
+            MEMBER memberName [(READ getFunction | WRITE setFunction)])
+           [RESET resetFunction]
+           [NOTIFY notifySignal]
+           [REVISION int]
+           [DESIGNABLE bool]
+           [SCRIPTABLE bool]
+           [STORED bool]
+           [USER bool]
+           [CONSTANT]
+           [FINAL])
+		   可以在编译静态属性，也可以在运行时通过setProperty（）动态增加属性。其实永不了那么多属性，经常用的也就是那么几个。
+	READ 读取函数
+	WRITE 可选配置，指定函数，只能有一个参数，返回值必须为void。
+	MEMBER 关联成员变量，就可以不用指定read和write函数了。
+	REAET 属性返回上下文匹配的默认值
+	NOTIFY 指定参数变化信号，最多一个参数，且类型一致
+	REVISION QML中shiyong
+	DESIGNABLE 是否可以有dedigner使用，默认为true
+	SCRIPTABLE 是否可以被脚本引擎使用
+	STORED 属性的独立性，还是从其他属性衍生出来
+	USER 是否可以被用户编辑
+	CONSTANT 是否为常量，如果是则不可以 NOTIFY 和 WRITE
+	FINAL 是否可以 被派生类修改
+	
+	READ WRITE RESET的指定函数可以是虚函数 ，继承来的函数
+	属性类型支持QVariant类型也可以是用户指定类型
+	
+	可以使用 READ函数和setPropety（）使用属性，setPropety（）时如果属性不存在，则会增加属性。
+	class Window : public QWidget
+{
+    Q_OBJECT
+    Q_PROPERTY(int normalProperty READ normalProperty)
+    Q_PROPERTY(int newProperty READ newProperty REVISION 1)
+
+public:
+    Window();
+    int normalProperty();
+    int newProperty();
+public slots:
+    void normalMethod();
+    Q_REVISION(1) void newMethod();
+};
+	属性可以同元对象找出来。
+	    Window window;
+    int expectedRevision = 0;
+    const QMetaObject *windowMetaObject = window.metaObject();
+    for (int i=0; i < windowMetaObject->methodCount(); i++)
+        if (windowMetaObject->method(i).revision() <= expectedRevision)
+            exposeMethod(windowMetaObject->method(i));
+    for (int i=0; i < windowMetaObject->propertyCount(); i++)
+        if (windowMetaObject->property(i).revision() <= expectedRevision)
+            exposeProperty(windowMetaObject->property(i));
+	
+
+	
