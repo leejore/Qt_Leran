@@ -1,0 +1,21 @@
+#-------------------------------------------------
+#
+# Project created by QtCreator 2015-07-10T23:30:30
+#
+#-------------------------------------------------
+
+QT       += core gui#surpport += -= canlinlude and delete QT lib can include core gui widgets network xml quik mutimedia webkit
+
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+TARGET = QTLog #target name
+TEMPLATE = app #defult templete 
+
+
+SOURCES += main.cpp\
+        mainwindow.cpp
+
+HEADERS  += mainwindow.h
+
+FORMS    += mainwindow.ui
+#INCLUDEPATH can use other lib
