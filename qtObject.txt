@@ -1,0 +1,52 @@
+1.#define Q_OBJECT \
+public: \
+    Q_OBJECT_CHECK \
+    static const QMetaObject staticMetaObject; \作用：定义静态元对象staticMetaObject
+    virtual const QMetaObject *metaObject() const; \作用：重载QOBJECT类定义的虚函数metaObject（）
+    virtual void *qt_metacast(const char *); \作用：重载QOBJECT类定义的虚函数qt_metacast（）
+    QT_TR_FUNCTIONS \作用：展开为{  define QT_TR_FUNCTIONS \
+    static inline QString tr(const char *s, const char *c = 0, int n = -1) \
+        { return staticMetaObject.tr(s, c, n); } \
+    QT_DEPRECATED static inline QString trUtf8(const char *s, const char *c = 0, int n = -1) \
+        { return staticMetaObject.tr(s, c, n); }  } 国际化处理字符串
+    virtual int qt_metacall(QMetaObject::Call, int, void **); \作用：重载QOBJECT类中的qt_metacall（）虚函数
+private: \
+    Q_DECL_HIDDEN_STATIC_METACALL static void qt_static_metacall(QObject *, QMetaObject::Call, int, void **); \作用：定义静态函数qt_static_metacall（）
+    struct QPrivateSignal {};
+	
+	这样就可以使用信号槽，动态属性，国际化等功能。
+	当使用了 Q_OBJECT 宏就有了staticMetaObject，这是QMetaObject的实例，他保存了类的所有信息，包括类名，信号的名字索引，槽的名字和索引等等。
+	常用的方法有
+	The functions you are most likely to find useful are these:
+
+className() returns the name of a class.
+superClass() returns the superclass's meta-object.
+method() and methodCount() provide information about a class's meta-methods (signals, slots and other invokable member functions).
+enumerator() and enumeratorCount() and provide information about a class's enumerators.
+propertyCount() and property() provide information about a class's properties.
+constructor() and constructorCount() provide information about a class's meta-constructors.
+这个和JAVA的反射机制有点类似。
+
+2.signals
+#   ifndef QT_NO_SIGNALS_SLOTS_KEYWORDS
+#     define slots
+#     define signals public
+#   endif
+可以看到如果不定义QT_NO_SIGNALS_SLOTS_KEYWORDS宏的话，signals是public的
+3.emit
+#ifndef QT_NO_EMIT
+# define emit
+emit 是个空宏，其实在MOC会使用这个宏，所以索然是个空宏，还是作用很大的。
+4.slots
+slots也是空宏，所以前面加的public 函数就是public的，可以和成员函数一样使用，但是在moc中又有另外的作用。
+5.SIGNALS SLIOT宏
+# define SLOT(a)     qFlagLocation("1"#a QLOCATION)  
+# define SIGNAL(a)   qFlagLocation("2"#a QLOCATION)
+Q_CORE_EXPORT const char *qFlagLocation(const char *method);
+使用#吧信号转化为2开头的字符串，这样在信号发射时就可以找到对应的信号。
+
+这些关键字的帮助moc工具扫描头文件提取信号和槽，还能直观简便的帮助开发人员理解含义。
+
+	
+	
+	
